@@ -1,6 +1,10 @@
-import {grpc} from "@improbable-eng/grpc-web";
-import {BookService} from "../_proto/examplecom/library/book_service_pb_service";
-import {QueryBooksRequest, Book, GetBookRequest} from "../_proto/examplecom/library/book_service_pb";
+import { grpc } from "@improbable-eng/grpc-web";
+import { BookService } from "../_proto/examplecom/library/book_service_pb_service";
+import {
+  QueryBooksRequest,
+  Book,
+  GetBookRequest,
+} from "../_proto/examplecom/library/book_service_pb";
 
 declare const USE_TLS: boolean;
 const host = USE_TLS ? "https://localhost:9091" : "http://localhost:9090";
@@ -11,7 +15,7 @@ function getBook() {
   grpc.unary(BookService.GetBook, {
     request: getBookRequest,
     host: host,
-    onEnd: res => {
+    onEnd: (res) => {
       const { status, statusMessage, headers, message, trailers } = res;
       console.log("getBook.onEnd.status", status, statusMessage);
       console.log("getBook.onEnd.headers", headers);
@@ -20,7 +24,7 @@ function getBook() {
       }
       console.log("getBook.onEnd.trailers", trailers);
       queryBooks();
-    }
+    },
   });
 }
 
