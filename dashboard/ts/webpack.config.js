@@ -47,4 +47,7 @@ module.exports = {
       USE_TLS: process.env.USE_TLS !== undefined,
     }),
   ],
+  devServer: {
+    headers: { "Access-Control-Allow-Origin": "*" },
+  },
 };
