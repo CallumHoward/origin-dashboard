@@ -1,4 +1,4 @@
-import * as React from "react";
+import React from "react";
 import { Table } from "reactstrap";
 import { useTable, useSortBy, useRowSelect } from "react-table";
 import styled from "styled-components";
@@ -26,7 +26,7 @@ type Props = {
   data: any[];
 };
 
-const DeviceTable: React.FunctionComponent<Props> = ({data}) => {
+const DeviceTable: React.FunctionComponent<Props> = ({ data }) => {
   const columns = React.useMemo(
     () => [
       {

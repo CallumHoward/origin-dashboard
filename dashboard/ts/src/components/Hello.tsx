@@ -1,4 +1,4 @@
-import * as React from "react";
+import React, { useState, useRef } from "react";
 import DeviceTable, { IElement } from "./DeviceTable";
 import Section from "./Section";
 import { Container, Row, Col } from "reactstrap";
@@ -7,8 +7,8 @@ const updateRateMS = 16000;
 let sourceData: IElement[] = [];
 
 export const Hello = () => {
-  const [deviceData, setDeviceData] = React.useState<IElement[]>([]);
-  const timerRunning = React.useRef(false);
+  const [deviceData, setDeviceData] = useState<IElement[]>([]);
+  const timerRunning = useRef(false);
 
   if (!timerRunning.current) {
     timerRunning.current = true;
