@@ -9,7 +9,7 @@ import {
 declare const USE_TLS: boolean;
 const host = USE_TLS ? "https://localhost:9091" : "http://localhost:9090";
 
-function getBook() {
+export function getBook() {
   const getBookRequest = new GetBookRequest();
   getBookRequest.setIsbn(60929871);
   grpc.unary(BookService.GetBook, {
@@ -27,8 +27,6 @@ function getBook() {
     },
   });
 }
-
-getBook();
 
 function queryBooks() {
   const queryBooksRequest = new QueryBooksRequest();
