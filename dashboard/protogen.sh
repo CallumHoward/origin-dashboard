@@ -32,4 +32,4 @@ protoc \
   --go_out=plugins=grpc:./go/_proto \
   --go_opt=paths=source_relative \
   --ts_out=service=true:./ts/_proto \
-  ./proto/examplecom/library/book_service.proto
+  ./proto/examplecom/library/device_service.proto
