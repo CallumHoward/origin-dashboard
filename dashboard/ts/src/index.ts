@@ -1,48 +1,48 @@
 import { grpc } from "@improbable-eng/grpc-web";
-import { BookService } from "../_proto/examplecom/library/book_service_pb_service";
+import { DeviceService } from "../_proto/examplecom/library/device_service_pb_service";
 import {
-  QueryBooksRequest,
-  Book,
-  GetBookRequest,
-} from "../_proto/examplecom/library/book_service_pb";
+  Device,
+  GetDeviceRequest,
+  Empty,
+} from "../_proto/examplecom/library/device_service_pb";
 
 declare const USE_TLS: boolean;
 const host = USE_TLS ? "https://localhost:9091" : "http://localhost:9090";
 
-export function getBook() {
-  const getBookRequest = new GetBookRequest();
-  getBookRequest.setIsbn(60929871);
-  grpc.unary(BookService.GetBook, {
-    request: getBookRequest,
+export const getDevice = () => {
+  const getDeviceRequest = new GetDeviceRequest();
+  getDeviceRequest.setId(60929871);
+  grpc.unary(DeviceService.GetDevice, {
+    request: getDeviceRequest,
     host: host,
     onEnd: (res) => {
       const { status, statusMessage, headers, message, trailers } = res;
-      console.log("getBook.onEnd.status", status, statusMessage);
-      console.log("getBook.onEnd.headers", headers);
+      console.log("getDevice.onEnd.status", status, statusMessage);
+      console.log("getDevice.onEnd.headers", headers);
       if (status === grpc.Code.OK && message) {
-        console.log("getBook.onEnd.message", message.toObject());
+        console.log("getDevice.onEnd.message", message.toObject());
       }
-      console.log("getBook.onEnd.trailers", trailers);
-      queryBooks();
+      console.log("getDevice.onEnd.trailers", trailers);
+      // queryDevices();
     },
   });
-}
+};
 
-function queryBooks() {
-  const queryBooksRequest = new QueryBooksRequest();
-  queryBooksRequest.setAuthorPrefix("Geor");
-  const client = grpc.client(BookService.QueryBooks, {
+export const queryDevices = (onDevice?: (device: Device) => void) => {
+  const queryDevicesRequest = new Empty();
+  const client = grpc.client(DeviceService.QueryDevices, {
     host: host,
   });
   client.onHeaders((headers: grpc.Metadata) => {
-    console.log("queryBooks.onHeaders", headers);
+    // console.log("queryDevices.onHeaders", headers);
   });
-  client.onMessage((message: Book) => {
-    console.log("queryBooks.onMessage", message.toObject());
+  client.onMessage((message: Device) => {
+    console.log("queryDevices.onMessage", message.toObject());
+    onDevice && onDevice(message);
   });
   client.onEnd((code: grpc.Code, msg: string, trailers: grpc.Metadata) => {
-    console.log("queryBooks.onEnd", code, msg, trailers);
+    // console.log("queryDevices.onEnd", code, msg, trailers);
   });
   client.start();
-  client.send(queryBooksRequest);
-}
+  client.send(queryDevicesRequest);
+};

@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import DeviceTable, { IElement } from "./DeviceTable";
 import Section from "./Section";
 import { Container, Row, Col } from "reactstrap";
-import { getBook } from "../index";
+import { queryDevices } from "../index";
 
 const updateRateMS = 16000;
 let sourceData: IElement[] = [];
@@ -11,7 +11,13 @@ export const Hello = () => {
   const [deviceData, setDeviceData] = useState<IElement[]>([]);
   const timerRunning = useRef(false);
 
-  useEffect(() => getBook(), []);
+  const addDevice = (element: IElement) => {
+    sourceData.push(element);
+    const newData = [...sourceData];
+    setDeviceData(newData);
+  };
+
+  useEffect(() => queryDevices(), []);
 
   if (!timerRunning.current) {
     timerRunning.current = true;
@@ -20,9 +26,7 @@ export const Hello = () => {
       if (!row) {
         return;
       }
-      sourceData.push(row);
-      const newData = [...sourceData];
-      setDeviceData(newData);
+      addDevice(row);
     }, updateRateMS);
   }
 
