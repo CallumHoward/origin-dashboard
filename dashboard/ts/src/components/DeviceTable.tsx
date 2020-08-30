@@ -14,7 +14,7 @@ const StyledTr = styled.tr`
 `;
 
 type Props = {
-  data: Device[];
+  data: Device.AsObject[];
 };
 
 const DeviceTable: React.FunctionComponent<Props> = ({ data }) => {
@@ -22,31 +22,31 @@ const DeviceTable: React.FunctionComponent<Props> = ({ data }) => {
     () => [
       {
         Header: "ID",
-        accessor: (d: Device) => d.getId(),
+        accessor: "id",
       },
       {
         Header: "Name",
-        accessor: (d: Device) => d.getName(),
+        accessor: "name",
       },
       {
         Header: "Type",
-        accessor: (d: Device) => d.getType(),
+        accessor: "type",
       },
       {
         Header: "Last Contact",
-        accessor: (d: Device) => d.getLastContact(),
+        accessor: "lastContact",
       },
       {
         Header: "Battery",
-        accessor: (d: Device) => d.getBattery(),
+        accessor: "battery",
       },
       {
         Header: "Version",
-        accessor: (d: Device) => d.getVersion(),
+        accessor: "version",
       },
       {
         Header: "Status",
-        accessor: (d: Device) => d.getStatus(),
+        accessor: "status",
       },
     ],
     []
@@ -107,7 +107,7 @@ const DeviceTable: React.FunctionComponent<Props> = ({ data }) => {
                   backgroundColor: row.isSelected ? "#eee" : "",
                 },
               })}
-              onClick={() => {
+              onClick={(e: any) => {
                 toggleAllRowsSelected(false);
                 row.toggleRowSelected();
               }}

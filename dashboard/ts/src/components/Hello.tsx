@@ -5,13 +5,13 @@ import { Container, Row, Col } from "reactstrap";
 import { queryDevices } from "../index";
 import { Device } from "../../_proto/examplecom/library/device_service_pb";
 
-let sourceData: Device[] = [];
+let sourceData: Device.AsObject[] = [];
 
 export const Hello = () => {
-  const [deviceData, setDeviceData] = useState<Device[]>([]);
+  const [deviceData, setDeviceData] = useState<Device.AsObject[]>([]);
 
   const addDevice = (device: Device) => {
-    sourceData.push(device);
+    sourceData.push(device.toObject());
     const newData = [...sourceData];
     setDeviceData(newData);
   };
