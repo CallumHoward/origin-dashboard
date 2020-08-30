@@ -11,7 +11,7 @@ const host = USE_TLS ? "https://localhost:9091" : "http://localhost:9090";
 
 export const getDevice = () => {
   const getDeviceRequest = new GetDeviceRequest();
-  getDeviceRequest.setId(60929871);
+  getDeviceRequest.setId("60929871");
   grpc.unary(DeviceService.GetDevice, {
     request: getDeviceRequest,
     host: host,
@@ -34,14 +34,14 @@ export const queryDevices = (onDevice?: (device: Device) => void) => {
     host: host,
   });
   client.onHeaders((headers: grpc.Metadata) => {
-    // console.log("queryDevices.onHeaders", headers);
+    console.log("queryDevices.onHeaders", headers);
   });
   client.onMessage((message: Device) => {
     console.log("queryDevices.onMessage", message.toObject());
     onDevice && onDevice(message);
   });
   client.onEnd((code: grpc.Code, msg: string, trailers: grpc.Metadata) => {
-    // console.log("queryDevices.onEnd", code, msg, trailers);
+    console.log("queryDevices.onEnd", code, msg, trailers);
   });
   client.start();
   client.send(queryDevicesRequest);

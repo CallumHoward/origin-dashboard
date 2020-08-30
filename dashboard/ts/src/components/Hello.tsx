@@ -1,34 +1,22 @@
-import React, { useState, useRef, useEffect } from "react";
-import DeviceTable, { IElement } from "./DeviceTable";
+import React, { useState, useEffect } from "react";
+import DeviceTable from "./DeviceTable";
 import Section from "./Section";
 import { Container, Row, Col } from "reactstrap";
 import { queryDevices } from "../index";
+import { Device } from "../../_proto/examplecom/library/device_service_pb";
 
-const updateRateMS = 16000;
-let sourceData: IElement[] = [];
+let sourceData: Device[] = [];
 
 export const Hello = () => {
-  const [deviceData, setDeviceData] = useState<IElement[]>([]);
-  const timerRunning = useRef(false);
+  const [deviceData, setDeviceData] = useState<Device[]>([]);
 
-  const addDevice = (element: IElement) => {
-    sourceData.push(element);
+  const addDevice = (device: Device) => {
+    sourceData.push(device);
     const newData = [...sourceData];
     setDeviceData(newData);
   };
 
-  useEffect(() => queryDevices(), []);
-
-  if (!timerRunning.current) {
-    timerRunning.current = true;
-    setInterval(() => {
-      const row = makeRow(sourceData.length);
-      if (!row) {
-        return;
-      }
-      addDevice(row);
-    }, updateRateMS);
-  }
+  useEffect(() => queryDevices(addDevice), []);
 
   return (
     <div style={{ backgroundColor: "#eee", height: "100vh", width: "100vw" }}>
@@ -51,20 +39,3 @@ export const Hello = () => {
     </div>
   );
 };
-
-function makeRow(id: number) {
-  let r = Math.floor(Math.random() * 3) + 1;
-  if (r == 0) {
-    return { col2: "Stacey" } as IElement;
-  }
-  if (r == 1) {
-    return { col2: "Monica" } as IElement;
-  }
-  if (r == 2) {
-    return { col2: "Jessica" } as IElement;
-  }
-  if (r == 3) {
-    return { col2: "Lucy" } as IElement;
-  }
-  return undefined;
-}

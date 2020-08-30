@@ -12,6 +12,7 @@
     "sourceMap": true,
     "strictNullChecks": true,
     "stripInternal": true,
+    "suppressImplicitAnyIndexErrors": true,
     "target": "es5"
   },
   "include": [

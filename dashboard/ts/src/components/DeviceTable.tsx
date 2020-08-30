@@ -5,6 +5,7 @@ import styled from "styled-components";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faAngleUp, faAngleDown } from "@fortawesome/free-solid-svg-icons";
+import { Device } from "../../_proto/examplecom/library/device_service_pb";
 
 const StyledTr = styled.tr`
   &:hover {
@@ -12,18 +13,8 @@ const StyledTr = styled.tr`
   }
 `;
 
-export type IElement = {
-  col1?: string;
-  col2?: string;
-  col3?: string;
-  col4?: string;
-  col5?: string;
-  col6?: string;
-  col7?: string;
-};
-
 type Props = {
-  data: any[];
+  data: Device[];
 };
 
 const DeviceTable: React.FunctionComponent<Props> = ({ data }) => {
@@ -31,31 +22,31 @@ const DeviceTable: React.FunctionComponent<Props> = ({ data }) => {
     () => [
       {
         Header: "ID",
-        accessor: "col1",
+        accessor: (d: Device) => d.getId(),
       },
       {
         Header: "Name",
-        accessor: "col2",
+        accessor: (d: Device) => d.getName(),
       },
       {
         Header: "Type",
-        accessor: "col3",
+        accessor: (d: Device) => d.getType(),
       },
       {
         Header: "Last Contact",
-        accessor: "col4",
+        accessor: (d: Device) => d.getLastContact(),
       },
       {
         Header: "Battery",
-        accessor: "col5",
+        accessor: (d: Device) => d.getBattery(),
       },
       {
         Header: "Version",
-        accessor: "col6",
+        accessor: (d: Device) => d.getVersion(),
       },
       {
         Header: "Status",
-        accessor: "col7",
+        accessor: (d: Device) => d.getStatus(),
       },
     ],
     []
@@ -116,7 +107,7 @@ const DeviceTable: React.FunctionComponent<Props> = ({ data }) => {
                   backgroundColor: row.isSelected ? "#eee" : "",
                 },
               })}
-              onClick={(e: any) => {
+              onClick={() => {
                 toggleAllRowsSelected(false);
                 row.toggleRowSelected();
               }}

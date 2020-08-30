@@ -62,7 +62,7 @@ type deviceService struct{}
 
 var devices = []*library.Device{
 	{
-		Id:          60929871,
+		Id:          "60929871",
 		Name:        "Alice",
 		Type:        "ESP32 D1 Mini",
 		LastContact: "2 mins ago",
@@ -71,7 +71,7 @@ var devices = []*library.Device{
 		Status:      "offline",
 	},
 	{
-		Id:          140009728,
+		Id:          "140009728",
 		Name:        "Bob",
 		Type:        "ESP32 D1 Mini",
 		LastContact: "2 mins ago",
@@ -80,7 +80,7 @@ var devices = []*library.Device{
 		Status:      "offline",
 	},
 	{
-		Id:          9780140301694,
+		Id:          "9780140301694",
 		Name:        "Charlie",
 		Type:        "ESP32 D1 Mini",
 		LastContact: "2 mins ago",
@@ -89,7 +89,7 @@ var devices = []*library.Device{
 		Status:      "offline",
 	},
 	{
-		Id:          140008381,
+		Id:          "140008381",
 		Name:        "David",
 		Type:        "ESP32 D1 Mini",
 		LastContact: "2 mins ago",
