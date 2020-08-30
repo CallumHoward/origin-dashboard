@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"time"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
@@ -97,6 +98,15 @@ var devices = []*library.Device{
 		Version:     "5.2.1",
 		Status:      "offline",
 	},
+	{
+		Id:          "60929871",
+		Name:        "Alice",
+		Type:        "ESP32 D1 Mini",
+		LastContact: "2 mins ago",
+		Battery:     "1%",
+		Version:     "5.2.1",
+		Status:      "offline",
+	},
 }
 
 func (s *deviceService) GetDevice(ctx context.Context, deviceQuery *library.GetDeviceRequest) (*library.Device, error) {
@@ -115,6 +125,7 @@ func (s *deviceService) GetDevice(ctx context.Context, deviceQuery *library.GetD
 func (s *deviceService) QueryDevices(e *library.Empty, stream library.DeviceService_QueryDevicesServer) error {
 	stream.SendHeader(metadata.Pairs("Pre-Response-Metadata", "Is-sent-as-headers-stream"))
 	for _, device := range devices {
+		time.Sleep(5000 * time.Millisecond)
 		stream.Send(device)
 	}
 	stream.SetTrailer(metadata.Pairs("Post-Response-Metadata", "Is-sent-as-trailers-stream"))

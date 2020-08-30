@@ -5,15 +5,16 @@ import { Container, Row, Col } from "reactstrap";
 import { queryDevices } from "../index";
 import { Device } from "../../_proto/examplecom/library/device_service_pb";
 
-let sourceData: Device.AsObject[] = [];
+let sourceData = new Map<string, Device.AsObject>();
 
 export const Hello = () => {
   const [deviceData, setDeviceData] = useState<Device.AsObject[]>([]);
 
   const addDevice = (device: Device) => {
-    sourceData.push(device.toObject());
-    const newData = [...sourceData];
-    setDeviceData(newData);
+    const d = device.toObject();
+    sourceData.set(d.id, d);
+    const dataArray = Array.from(sourceData.values());
+    setDeviceData(dataArray);
   };
 
   useEffect(() => queryDevices(addDevice), []);
