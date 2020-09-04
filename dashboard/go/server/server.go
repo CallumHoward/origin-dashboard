@@ -1,7 +1,6 @@
 package main
 
 import (
-	"flag"
 	"fmt"
 	"log"
 	"net/http"
@@ -18,19 +17,8 @@ import (
 	library "origin/dashboard/go/_proto/examplecom/library"
 )
 
-var (
-	enableTls       = flag.Bool("enable_tls", false, "Use TLS - required for HTTP2.")
-	tlsCertFilePath = flag.String("tls_cert_file", "../../misc/localhost.crt", "Path to the CRT/PEM file.")
-	tlsKeyFilePath  = flag.String("tls_key_file", "../../misc/localhost.key", "Path to the private key file.")
-)
-
 func main() {
-	flag.Parse()
-
 	port := 9090
-	if *enableTls {
-		port = 9091
-	}
 
 	grpcServer := grpc.NewServer()
 	library.RegisterDeviceServiceServer(grpcServer, &deviceService{})
@@ -46,16 +34,10 @@ func main() {
 		Handler: http.HandlerFunc(handler),
 	}
 
-	grpclog.Printf("Starting server. http port: %d, with TLS: %v", port, *enableTls)
+	grpclog.Printf("Starting server. http port: %d", port)
 
-	if *enableTls {
-		if err := httpServer.ListenAndServeTLS(*tlsCertFilePath, *tlsKeyFilePath); err != nil {
-			grpclog.Fatalf("failed starting http2 server: %v", err)
-		}
-	} else {
-		if err := httpServer.ListenAndServe(); err != nil {
-			grpclog.Fatalf("failed starting http server: %v", err)
-		}
+	if err := httpServer.ListenAndServe(); err != nil {
+		grpclog.Fatalf("failed starting http server: %v", err)
 	}
 }
 
