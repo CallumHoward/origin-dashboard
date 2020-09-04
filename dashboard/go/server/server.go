@@ -42,7 +42,7 @@ func main() {
 			Id:          message,
 			Name:        name,
 			Type:        "ESP32 D1 Mini",
-			LastContact: now.UTC().String(),
+			LastContact: fmt.Sprint(now.UTC().Unix()),
 			Battery:     "15%",
 			Version:     "5.2.1",
 			Status:      "online",
