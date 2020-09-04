@@ -23,6 +23,9 @@ import (
 var devices = []*library.Device{}
 
 func main() {
+	deviceNames := make(map[string]string)
+	deviceNames["70217"] = "Alice"
+
 	var onRollCall mqtt.MessageHandler = func(client mqtt.Client, msg mqtt.Message) {
 		message := string(msg.Payload())
 		fmt.Printf("TOPIC: %s\n", msg.Topic())
@@ -30,14 +33,19 @@ func main() {
 		if message == "hello" {
 			return
 		}
+		now := time.Now()
+		name, found := deviceNames[message]
+		if !found {
+			name = "[No name]"
+		}
 		newDevice := library.Device{
 			Id:          message,
-			Name:        "Alice",
+			Name:        name,
 			Type:        "ESP32 D1 Mini",
-			LastContact: "2 mins ago",
+			LastContact: now.UTC().String(),
 			Battery:     "15%",
 			Version:     "5.2.1",
-			Status:      "offline",
+			Status:      "online",
 		}
 		devices = append(devices, &newDevice)
 	}
@@ -91,7 +99,7 @@ func (s *deviceService) GetDevice(ctx context.Context, deviceQuery *library.GetD
 func (s *deviceService) QueryDevices(e *library.Empty, stream library.DeviceService_QueryDevicesServer) error {
 	stream.SendHeader(metadata.Pairs("Pre-Response-Metadata", "Is-sent-as-headers-stream"))
 	for _, device := range devices {
-		time.Sleep(5000 * time.Millisecond)
+		// time.Sleep(5000 * time.Millisecond)
 		stream.Send(device)
 	}
 	stream.SetTrailer(metadata.Pairs("Post-Response-Metadata", "Is-sent-as-trailers-stream"))
