@@ -2,6 +2,17 @@
 
 
 [[projects]]
+  digest = "1:bb89a2542933056fcebc2950bb15ec636e623cc43c96597288aa2009f15b0ce1"
+  name = "github.com/eclipse/paho.mqtt.golang"
+  packages = [
+    ".",
+    "packets",
+  ]
+  pruneopts = "UT"
+  revision = "adca289fdcf8c883800aafa545bc263452290bae"
+  version = "v1.2.0"
+
+[[projects]]
   digest = "1:4a32eb57407190eced21a21abee9ce4d4ab6f0bf113ca61cb1cb2d549a65c985"
   name = "github.com/golang/protobuf"
   packages = [
@@ -41,7 +52,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:9349bd005ea80ec1b37032d01daedc81168348a9c295f7846188adfb2f405554"
+  digest = "1:4a99cb359190b75a943c0eb5241f49998119a1869ef052833ee1c336155da8ad"
   name = "golang.org/x/net"
   packages = [
     "context",
@@ -49,9 +60,12 @@
     "http2",
     "http2/hpack",
     "idna",
+    "internal/socks",
     "internal/timeseries",
     "lex/httplex",
+    "proxy",
     "trace",
+    "websocket",
   ]
   pruneopts = "UT"
   revision = "5f9ae10d9af5b1c89ae6904293b14b064d4ada23"
@@ -190,6 +204,7 @@
   analyzer-name = "dep"
   analyzer-version = 1
   input-imports = [
+    "github.com/eclipse/paho.mqtt.golang",
     "github.com/golang/protobuf/proto",
     "github.com/improbable-eng/grpc-web/go/grpcweb",
     "golang.org/x/net/context",
