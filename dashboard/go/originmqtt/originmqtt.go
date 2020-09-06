@@ -10,18 +10,19 @@ import (
 )
 
 type originMqtt struct {
-	opts   *mqtt.ClientOptions
-	client mqtt.Client
+	opts        *mqtt.ClientOptions
+	client      mqtt.Client
+	msgHandlers map[string]mqtt.MessageHandler
 }
 
 func New(brokerUri string, onMessage mqtt.MessageHandler) originMqtt {
 	mqtt.DEBUG = log.New(os.Stdout, "[mqtt.DEBUG] ", 0)
 	mqtt.ERROR = log.New(os.Stdout, "[mqtt.ERROR] ", 0)
-	opts := mqtt.NewClientOptions().AddBroker(brokerUri).SetClientID("gotrivial")
+	opts := mqtt.NewClientOptions().AddBroker(brokerUri).SetClientID("arbiter")
 	opts.SetKeepAlive(2 * time.Second)
 	opts.SetDefaultPublishHandler(onMessage)
 	// opts.SetPingTimeout(1 * time.Second)
-	om := originMqtt{opts, nil}
+	om := originMqtt{opts, nil, nil}
 	return om
 }
 
@@ -47,6 +48,9 @@ func (om originMqtt) RollCall() {
 		panic("ERROR: MQTT client not connected when used!")
 	}
 	if token := om.client.Subscribe("rollCall", 0, nil); token.Wait() && token.Error() != nil {
+		panic(token.Error())
+	}
+	if token := om.client.Subscribe("ping", 0, nil); token.Wait() && token.Error() != nil {
 		panic(token.Error())
 	}
 	token := om.client.Publish("rollCall", 0, false, "hello")
