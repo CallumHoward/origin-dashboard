@@ -25,7 +25,7 @@ import (
 var devices = []*library.Device{}
 
 func main() {
-	ds := deviceService{make(chan *library.Device, 5), make(chan bool)}
+	ds := deviceService{make(chan *library.Device), make(chan bool)}
 	deviceNames := make(map[string]string)
 	deviceNames["70217"] = "Alice"
 	deviceNames["38E0D"] = "Bob"
@@ -55,13 +55,17 @@ func main() {
 }
 
 func addDevice(deviceNames map[string]string, message string) library.Device {
-	tokens := strings.Split(message, " ")
-	id := tokens[0]
-
-	battery := "?"
-	if len(tokens) > 1 {
-		battery = tokens[1]
+	tokens := strings.Split(message, ",")
+	if len(tokens) != 6 {
+		fmt.Printf("Error: unpacked wrong number of tokens from MQTT payload: %s\n", message)
+		return library.Device{}
 	}
+	id := tokens[0]
+	deviceType := tokens[1]
+	uptime := tokens[2]
+	battery := tokens[3]
+	version := tokens[4]
+	ip := tokens[5]
 
 	// Last contact
 	now := time.Now()
@@ -75,11 +79,13 @@ func addDevice(deviceNames map[string]string, message string) library.Device {
 	newDevice := library.Device{
 		Id:          id,
 		Name:        name,
-		Type:        "ESP32 D1 Mini",
+		Type:        deviceType,
 		LastContact: fmt.Sprint(now.UTC().Unix()),
+		Uptime:      uptime,
 		Battery:     battery,
-		Version:     "5.2.1",
+		Version:     version,
 		Status:      "online",
+		Ip:          ip,
 	}
 	devices = append(devices, &newDevice)
 	return newDevice

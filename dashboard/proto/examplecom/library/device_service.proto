@@ -7,9 +7,11 @@ message Device {
   string name = 2;
   string type = 3;
   string last_contact = 4;
-  string battery = 5;
-  string version = 6;
-  string status = 7;
+  string uptime = 5;
+  string battery = 6;
+  string version = 7;
+  string status = 8;
+  string ip = 9;
 }
 
 message GetDeviceRequest {

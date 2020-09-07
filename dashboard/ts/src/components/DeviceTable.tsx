@@ -22,7 +22,9 @@ const DeviceTable: React.FunctionComponent<Props> = ({ data }) => {
     () => [
       {
         Header: "ID",
-        accessor: "id",
+        accessor: (row: Device.AsObject) => {
+          return <a href={`http://${row.ip}`}>{row.id}</a>;
+        },
       },
       {
         Header: "Name",
