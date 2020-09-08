@@ -5,7 +5,8 @@ export const FileUploader = () => {
     const [files, setFiles] = useState<FileList | null>(null);
 
     const onChooseFile = (newFiles: FileList | null) => {
-        setFiles(newFiles)
+        setUploadStatus("");
+        setFiles(newFiles);
     }
     const uploadFile = (event: React.MouseEvent<HTMLButtonElement>) => {
         event.preventDefault();
@@ -13,10 +14,12 @@ export const FileUploader = () => {
             return;
         }
         const xhr = new XMLHttpRequest();
-        xhr.open("POST", "http://192.168.20.18:2020/upload");
-        xhr.addEventListener("progress", (event) => {
-            setUploadStatus(`progress: ${event.loaded}%`);
-        });
+        // xhr.upload.addEventListener("progress", (event) => {
+        //     if (event.lengthComputable) {
+        //         setUploadStatus(`progress: ${event.loaded / event.total}%`);
+        //     }
+        //     setUploadStatus('uploading... unknown %'); 
+        // });
         xhr.addEventListener("error", (event) => {
             setUploadStatus(`upload failed`);
         })
@@ -24,9 +27,10 @@ export const FileUploader = () => {
             if (xhr.status == 200) {
                 setUploadStatus("file uploaded successfully");
             } else {
-                setUploadStatus(`file uploaded, but error occured. HTTP status: ${xhr.status} Response: ${JSON.stringify(xhr.response)}`);
+                setUploadStatus(`file uploaded, but was not 200 OK. HTTP status: ${xhr.status} Response: ${JSON.stringify(xhr.response)}`);
             }
         })
+        xhr.open("POST", "http://192.168.20.18:2020/upload");
         const formData = new FormData();
         formData.append('myFile', files[0]);
         xhr.send(formData);
