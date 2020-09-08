@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import DeviceTable from "./DeviceTable";
 import Section from "./Section";
+import { FileUploader } from "./FileUploader";
 import { Container, Row, Col } from "reactstrap";
 import { queryDevices } from "../index";
 import { Device } from "../../_proto/examplecom/library/device_service_pb";
@@ -26,6 +27,13 @@ export const Hello = () => {
           <Col>
             <Section>
               <h1>Dashboard</h1>
+            </Section>
+          </Col>
+        </Row>
+        <Row>
+          <Col>
+            <Section>
+              <FileUploader />
             </Section>
           </Col>
         </Row>
