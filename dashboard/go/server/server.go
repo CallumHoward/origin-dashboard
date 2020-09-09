@@ -15,6 +15,7 @@ import (
 
 	library "origin/dashboard/go/_proto/examplecom/library"
 	originmqtt "origin/dashboard/go/originmqtt"
+    upload "origin/dashboard/go/upload"
 
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 
@@ -25,6 +26,7 @@ import (
 var devices = []*library.Device{}
 
 func main() {
+    chan upload.SetupRoutes()
 	ds := deviceService{make(chan *library.Device, 5), make(chan bool)}
 	deviceNames := make(map[string]string)
 	deviceNames["70217"] = "Alice"
@@ -49,9 +51,9 @@ func main() {
 
 	om := originmqtt.New("192.168.20.11:1883", onRollCall)
 	om.Connect()
+	defer om.Disconnect()
 	om.RollCall()
 	serve(&ds)
-	om.Disconnect()
 }
 
 func addDevice(deviceNames map[string]string, message string) library.Device {
