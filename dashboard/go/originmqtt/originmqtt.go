@@ -16,7 +16,7 @@ type originMqtt struct {
 }
 
 func New(brokerUri string, onMessage mqtt.MessageHandler) originMqtt {
-	mqtt.DEBUG = log.New(os.Stdout, "[mqtt.DEBUG] ", 0)
+	// mqtt.DEBUG = log.New(os.Stdout, "[mqtt.DEBUG] ", 0)
 	mqtt.ERROR = log.New(os.Stdout, "[mqtt.ERROR] ", 0)
 	opts := mqtt.NewClientOptions().AddBroker(brokerUri).SetClientID("arbiter")
 	opts.SetKeepAlive(2 * time.Second)

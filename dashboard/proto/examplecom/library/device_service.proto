@@ -1,6 +1,7 @@
 syntax = "proto3";
 
 package examplecom.library;
+option go_package = "origin/dashboard/proto/examplecom/library;library";
 
 message Device {
   string id = 1;
@@ -23,4 +24,5 @@ message Empty {}
 service DeviceService {
   rpc GetDevice(GetDeviceRequest) returns (Device) {}
   rpc QueryDevices(Empty) returns (stream Device) {}
+  rpc KeepAlive(Empty) returns (Empty) {}
 }

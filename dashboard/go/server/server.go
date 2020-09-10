@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"os"
 	"strings"
+	"sync"
 	"time"
 
 	"google.golang.org/grpc"
@@ -25,7 +26,12 @@ import (
 var devices = map[string]*library.Device{}
 
 func main() {
-	ds := deviceService{make(chan *library.Device), make(chan bool)}
+	ds := deviceService{
+		make(chan *library.Device),
+		make(chan bool, 3),
+		time.Now(),
+		sync.Mutex{},
+	}
 	deviceNames := make(map[string]string)
 	deviceNames["70217"] = "Alice"
 	deviceNames["38E0D"] = "Bob"
@@ -116,8 +122,16 @@ func serve(ds *deviceService) {
 }
 
 type deviceService struct {
-	dChan   chan *library.Device
-	endChan chan bool
+	dChan    chan *library.Device
+	endChan  chan bool
+	alive    time.Time
+	aliveMux sync.Mutex
+}
+
+func (s *deviceService) IsAlive() bool {
+	s.aliveMux.Lock()
+	defer s.aliveMux.Unlock()
+	return time.Now().Sub(s.alive) < (30 * time.Second)
 }
 
 func (s *deviceService) GetDevice(ctx context.Context, deviceQuery *library.GetDeviceRequest) (*library.Device, error) {
@@ -132,10 +146,19 @@ func (s *deviceService) GetDevice(ctx context.Context, deviceQuery *library.GetD
 }
 
 func (s *deviceService) QueryDevices(e *library.Empty, stream library.DeviceService_QueryDevicesServer) error {
+	// Reset keep alive
+	s.aliveMux.Lock()
+	s.alive = time.Now()
+	s.aliveMux.Unlock()
+
+	// Stream known devices
 	stream.SendHeader(metadata.Pairs("Pre-Response-Metadata", "Is-sent-as-headers-stream"))
+	fmt.Printf("sending %d known device(s)\n", len(devices))
 	for _, device := range devices {
 		stream.Send(device)
 	}
+
+	// Stream new devices
 	for {
 		select {
 		case device := <-s.dChan:
@@ -144,10 +167,24 @@ func (s *deviceService) QueryDevices(e *library.Empty, stream library.DeviceServ
 		case <-s.endChan:
 			stream.SetTrailer(metadata.Pairs(
 				"Post-Response-Metadata", "Is-sent-as-trailers-stream"))
+			fmt.Println("end consumer - ended")
 			return nil
 		default:
 			fmt.Println("sleeping")
 			time.Sleep(500 * time.Millisecond)
+			if !s.IsAlive() {
+				fmt.Println("No keepalive, will now end")
+				s.endChan <- true
+			}
 		}
 	}
+}
+
+func (s *deviceService) KeepAlive(ctx context.Context, e *library.Empty) (*library.Empty, error) {
+	fmt.Println("going to keep alive")
+	s.aliveMux.Lock()
+	defer s.aliveMux.Unlock()
+	s.alive = time.Now()
+	fmt.Println("kept alive")
+	return e, nil
 }

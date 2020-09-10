@@ -1,6 +1,7 @@
-import React from "react";
+import React, { useCallback } from "react";
 import { Table } from "reactstrap";
 import { useTable, useSortBy, useRowSelect } from "react-table";
+import { fromUnixTime, intervalToDuration, formatDuration } from "date-fns";
 import styled from "styled-components";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -15,9 +16,10 @@ const StyledTr = styled.tr`
 
 type Props = {
   data: Device.AsObject[];
+  now: Date;
 };
 
-const DeviceTable: React.FunctionComponent<Props> = ({ data }) => {
+const DeviceTable: React.FunctionComponent<Props> = ({ data, now }) => {
   const columns = React.useMemo(
     () => [
       {
@@ -36,7 +38,17 @@ const DeviceTable: React.FunctionComponent<Props> = ({ data }) => {
       },
       {
         Header: "Last Contact",
-        accessor: "lastContact",
+        accessor: (row) => {
+          // console.log(fromUnixTime(row.lastContact));
+          const duration =
+            formatDuration(
+              intervalToDuration({
+                start: now,
+                end: fromUnixTime(row.lastContact),
+              })
+            ) || "0 seconds";
+          return `~${duration} ago`;
+        },
       },
       {
         Header: "Battery",
@@ -51,8 +63,10 @@ const DeviceTable: React.FunctionComponent<Props> = ({ data }) => {
         accessor: "status",
       },
     ],
-    []
+    [now]
   );
+
+  const getRowId = useCallback((row) => row.id, []);
 
   const {
     getTableProps,
@@ -68,7 +82,8 @@ const DeviceTable: React.FunctionComponent<Props> = ({ data }) => {
       columns,
     },
     useSortBy,
-    useRowSelect
+    useRowSelect,
+    getRowId
   );
 
   return (
@@ -109,7 +124,7 @@ const DeviceTable: React.FunctionComponent<Props> = ({ data }) => {
                   backgroundColor: row.isSelected ? "#eee" : "",
                 },
               })}
-              onClick={(e: any) => {
+              onClick={() => {
                 toggleAllRowsSelected(false);
                 row.toggleRowSelected();
               }}
