@@ -22,7 +22,7 @@ import (
 	"golang.org/x/net/context"
 )
 
-var devices = []*library.Device{}
+var devices = map[string]*library.Device{}
 
 func main() {
 	ds := deviceService{make(chan *library.Device), make(chan bool)}
@@ -41,7 +41,7 @@ func main() {
 			updatedDevice := addDevice(deviceNames, message)
 			ds.dChan <- &updatedDevice
 		default:
-			fmt.Println("Unhandled MQQT topic:")
+			fmt.Println("Unhandled MQTT topic:")
 		}
 		fmt.Printf("TOPIC: %s\n", msg.Topic())
 		fmt.Printf("MSG: %s\n", message)
@@ -80,14 +80,14 @@ func addDevice(deviceNames map[string]string, message string) library.Device {
 		Id:          id,
 		Name:        name,
 		Type:        deviceType,
-		LastContact: fmt.Sprint(now.UTC().Unix()),
+		LastContact: now.UTC().Unix(),
 		Uptime:      uptime,
 		Battery:     battery,
 		Version:     version,
 		Status:      "online",
 		Ip:          ip,
 	}
-	devices = append(devices, &newDevice)
+	devices[newDevice.Id] = &newDevice
 	return newDevice
 }
 
@@ -95,8 +95,7 @@ func serve(ds *deviceService) {
 	port := 9090
 
 	grpcServer := grpc.NewServer()
-	library.RegisterDeviceServiceServer(grpcServer,
-		ds)
+	library.RegisterDeviceServiceServer(grpcServer, ds)
 	grpclog.SetLogger(log.New(os.Stdout, "server: ", log.LstdFlags))
 
 	wrappedServer := grpcweb.WrapServer(grpcServer)
@@ -125,10 +124,8 @@ func (s *deviceService) GetDevice(ctx context.Context, deviceQuery *library.GetD
 	grpc.SendHeader(ctx, metadata.Pairs("Pre-Response-Metadata", "Is-sent-as-headers-unary"))
 	grpc.SetTrailer(ctx, metadata.Pairs("Post-Response-Metadata", "Is-sent-as-trailers-unary"))
 
-	for _, device := range devices {
-		if device.Id == deviceQuery.Id {
-			return device, nil
-		}
+	if val, ok := devices[deviceQuery.Id]; ok {
+		return val, nil
 	}
 
 	return nil, grpc.Errorf(codes.NotFound, "Device could not be found")
