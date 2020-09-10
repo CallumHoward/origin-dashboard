@@ -6,7 +6,7 @@ message Device {
   string id = 1;
   string name = 2;
   string type = 3;
-  string last_contact = 4;
+  int64 last_contact = 4;
   string uptime = 5;
   string battery = 6;
   string version = 7;
