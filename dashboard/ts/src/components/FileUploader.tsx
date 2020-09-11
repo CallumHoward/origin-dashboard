@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import styled from "styled-components";
-import { FormGroup, Input, Label, Form, Button } from "reactstrap";
+import { FormGroup, Input, Label, Form, Button, Alert } from "reactstrap";
+import { listVersions } from "..";
 
-const UploadContainer = styled.div`
+const StyledForm = styled(Form)`
   display: flex;
   div {
     width: 100%;
@@ -17,6 +18,15 @@ const VersionSelector = styled.div`
 export const FileUploader = () => {
   const [uploadStatus, setUploadStatus] = useState<string>("");
   const [files, setFiles] = useState<FileList | null>(null);
+  const [versions, setVersions] = useState<string[]>([]);
+
+  useEffect(() => {
+    console.log("listing versions");
+    listVersions((filenames: string[]) => {
+      setVersions(filenames);
+      console.log("got: ", filenames);
+    });
+  }, [uploadStatus]);
 
   const onChooseFile = (newFiles: FileList | null) => {
     setUploadStatus("");
@@ -54,31 +64,30 @@ export const FileUploader = () => {
     xhr.send(formData);
   };
   return (
-    <UploadContainer>
-      <div>
+    <StyledForm>
+      <FormGroup>
+        <Label>Upload new version</Label>
         <Form encType="multipart/form-data">
           <Input
             type="file"
             accept=".bin"
             onChange={(e) => onChooseFile(e.target.files)}
           />
-          <p>{uploadStatus}</p>
           <Button type="submit" onClick={uploadFile}>
             Upload
           </Button>
+          {!!uploadStatus && <Alert color="primary">{uploadStatus}</Alert>}
         </Form>
-      </div>
+      </FormGroup>
       <FormGroup>
         <Label>Flash with version</Label>
         <Input type="select" name="version-selector" multiple>
-          <option>upload-123.bin</option>
-          <option>upload-123.bin</option>
-          <option>upload-123.bin</option>
-          <option>upload-123.bin</option>
-          <option>upload-123.bin</option>
+          {versions.map((v, i) => (
+            <option key={i}>{v}</option>
+          ))}
         </Input>
         <Button>Flash</Button>
       </FormGroup>
-    </UploadContainer>
+    </StyledForm>
   );
 };

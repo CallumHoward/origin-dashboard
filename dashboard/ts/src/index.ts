@@ -4,6 +4,7 @@ import {
   Device,
   GetDeviceRequest,
   Empty,
+  Versions,
 } from "../_proto/examplecom/library/device_service_pb";
 
 declare const USE_TLS: boolean;
@@ -38,6 +39,25 @@ export const keepAlive = () => {
       console.log("getDevice.onEnd.headers", headers);
       if (status === grpc.Code.OK && message) {
         console.log("getDevice.onEnd.message", message.toObject());
+      }
+      console.log("getDevice.onEnd.trailers", trailers);
+    },
+  });
+};
+
+export const listVersions = (callback: (filenames: string[]) => void) => {
+  const listVersionsRequest = new Empty();
+  grpc.unary(DeviceService.ListVersions, {
+    request: listVersionsRequest,
+    host: host,
+    onEnd: (res) => {
+      const { status, statusMessage, headers, message, trailers } = res;
+      console.log("getDevice.onEnd.status", status, statusMessage);
+      console.log("getDevice.onEnd.headers", headers);
+      if (status === grpc.Code.OK && message) {
+        const versions = message as Versions;
+        console.log("getDevice.onEnd.message", versions.toObject());
+        callback(versions.getFilenamesList());
       }
       console.log("getDevice.onEnd.trailers", trailers);
     },

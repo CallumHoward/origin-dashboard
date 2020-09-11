@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"time"
 )
 
 func uploadFile(w http.ResponseWriter, r *http.Request) {
@@ -27,7 +28,8 @@ func uploadFile(w http.ResponseWriter, r *http.Request) {
 		fmt.Printf("MIME Header: %v\n", handler.Header)
 
 		// Write temporary file on our server
-		tempFile, err := ioutil.TempFile("uploads", "upload-*.bin")
+		filename := time.Now().Format("060102T150405")
+		tempFile, err := ioutil.TempFile("uploads", filename+"-*.bin")
 		if err != nil {
 			fmt.Println(err)
 		}

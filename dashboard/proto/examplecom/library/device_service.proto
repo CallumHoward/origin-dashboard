@@ -21,8 +21,13 @@ message GetDeviceRequest {
 
 message Empty {}
 
+message Versions {
+  repeated string filenames = 1;
+}
+
 service DeviceService {
   rpc GetDevice(GetDeviceRequest) returns (Device) {}
   rpc QueryDevices(Empty) returns (stream Device) {}
   rpc KeepAlive(Empty) returns (Empty) {}
+  rpc ListVersions(Empty) returns (Versions) {}
 }

@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"path/filepath"
 	"strings"
 	"sync"
 	"time"
@@ -190,4 +191,27 @@ func (s *deviceService) KeepAlive(ctx context.Context, e *library.Empty) (*libra
 	s.alive = time.Now()
 	fmt.Println("kept alive")
 	return e, nil
+}
+
+func (s *deviceService) ListVersions(ctx context.Context, e *library.Empty) (*library.Versions, error) {
+	fmt.Println("listing versions")
+	grpc.SendHeader(ctx, metadata.Pairs("Pre-Response-Metadata", "Is-sent-as-headers-unary"))
+	grpc.SetTrailer(ctx, metadata.Pairs("Post-Response-Metadata", "Is-sent-as-trailers-unary"))
+
+	var versions library.Versions
+	root := "uploads/"
+	err := filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
+		if strings.HasSuffix(path, ".bin") {
+			versions.Filenames = append(versions.Filenames, path)
+		}
+		return nil
+	})
+
+	if err == nil {
+		for _, file := range versions.Filenames {
+			fmt.Println(file)
+		}
+	}
+
+	return &versions, err
 }
