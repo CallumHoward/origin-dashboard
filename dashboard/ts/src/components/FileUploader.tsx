@@ -10,9 +10,16 @@ const StyledForm = styled(Form)`
   }
 `;
 
-const VersionSelector = styled.div`
-  height: 100%;
-  overflow-y: scroll;
+const StyledLabel = styled(Label)`
+  margin: 0.5rem 0 0.5rem 0;
+`;
+
+const StyledButton = styled(Button)`
+  margin: 0.5rem 0 0.5rem 0;
+`;
+
+const StyledInput = styled(Input)`
+  margin: 0.5rem 0 0.5rem 0;
 `;
 
 export const FileUploader = () => {
@@ -44,10 +51,10 @@ export const FileUploader = () => {
     //     }
     //     setUploadStatus('uploading... unknown %');
     // });
-    xhr.addEventListener("error", (event) => {
+    xhr.addEventListener("error", () => {
       setUploadStatus(`upload failed`);
     });
-    xhr.addEventListener("load", (event) => {
+    xhr.addEventListener("load", () => {
       if (xhr.status == 200) {
         setUploadStatus("file uploaded successfully");
       } else {
@@ -66,27 +73,29 @@ export const FileUploader = () => {
   return (
     <StyledForm>
       <FormGroup>
-        <Label>Upload new version</Label>
+        <StyledLabel>Upload new version</StyledLabel>
         <Form encType="multipart/form-data">
-          <Input
+          <StyledInput
             type="file"
             accept=".bin"
-            onChange={(e) => onChooseFile(e.target.files)}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+              onChooseFile(e.target.files)
+            }
           />
-          <Button type="submit" onClick={uploadFile}>
+          <StyledButton type="submit" onClick={uploadFile}>
             Upload
-          </Button>
+          </StyledButton>
           {!!uploadStatus && <Alert color="primary">{uploadStatus}</Alert>}
         </Form>
       </FormGroup>
       <FormGroup>
-        <Label>Flash with version</Label>
-        <Input type="select" name="version-selector" multiple>
+        <StyledLabel>Flash with version</StyledLabel>
+        <StyledInput type="select" name="version-selector" multiple>
           {versions.map((v, i) => (
             <option key={i}>{v}</option>
           ))}
-        </Input>
-        <Button>Flash</Button>
+        </StyledInput>
+        <StyledButton>Flash</StyledButton>
       </FormGroup>
     </StyledForm>
   );
