@@ -12,6 +12,17 @@ const StyledTr = styled.tr`
   &:hover {
     background-color: #f9f9f9;
   }
+  td {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+`;
+
+const StyledTh = styled.th`
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 `;
 
 type Props = {
@@ -87,12 +98,20 @@ const DeviceTable: React.FunctionComponent<Props> = ({ data, now }) => {
   );
 
   return (
-    <Table {...getTableProps()}>
+    <Table
+      hover={true}
+      responsive={true}
+      striped={true}
+      size={"sm"}
+      {...getTableProps()}
+    >
       <thead style={{ whiteSpace: "nowrap" }}>
         {headerGroups.map((headerGroup) => (
           <tr {...headerGroup.getHeaderGroupProps()}>
             {headerGroup.headers.map((column) => (
-              <th {...column.getHeaderProps(column.getSortByToggleProps())}>
+              <StyledTh
+                {...column.getHeaderProps(column.getSortByToggleProps())}
+              >
                 {column.render("Header")}
                 <span style={{ paddingLeft: "0.5rem" }}>
                   {column.isSorted ? (
@@ -108,7 +127,7 @@ const DeviceTable: React.FunctionComponent<Props> = ({ data, now }) => {
                     />
                   )}
                 </span>
-              </th>
+              </StyledTh>
             ))}
           </tr>
         ))}

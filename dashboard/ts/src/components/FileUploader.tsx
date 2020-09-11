@@ -1,4 +1,18 @@
 import React, { useState } from "react";
+import styled from "styled-components";
+import { FormGroup, Input, Label, Form, Button } from "reactstrap";
+
+const UploadContainer = styled.div`
+  display: flex;
+  div {
+    width: 100%;
+  }
+`;
+
+const VersionSelector = styled.div`
+  height: 100%;
+  overflow-y: scroll;
+`;
 
 export const FileUploader = () => {
   const [uploadStatus, setUploadStatus] = useState<string>("");
@@ -40,14 +54,31 @@ export const FileUploader = () => {
     xhr.send(formData);
   };
   return (
-    <div>
-      <form encType="multipart/form-data">
-        <input type="file" onChange={(e) => onChooseFile(e.target.files)} />
-        <p>{uploadStatus}</p>
-        <button type="submit" onClick={uploadFile}>
-          submit
-        </button>
-      </form>
-    </div>
+    <UploadContainer>
+      <div>
+        <Form encType="multipart/form-data">
+          <Input
+            type="file"
+            accept=".bin"
+            onChange={(e) => onChooseFile(e.target.files)}
+          />
+          <p>{uploadStatus}</p>
+          <Button type="submit" onClick={uploadFile}>
+            Upload
+          </Button>
+        </Form>
+      </div>
+      <FormGroup>
+        <Label>Flash with version</Label>
+        <Input type="select" name="version-selector" multiple>
+          <option>upload-123.bin</option>
+          <option>upload-123.bin</option>
+          <option>upload-123.bin</option>
+          <option>upload-123.bin</option>
+          <option>upload-123.bin</option>
+        </Input>
+        <Button>Flash</Button>
+      </FormGroup>
+    </UploadContainer>
   );
 };
