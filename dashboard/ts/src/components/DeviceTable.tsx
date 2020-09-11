@@ -1,17 +1,20 @@
 import React, { useCallback } from "react";
 import { Table } from "reactstrap";
-import { useTable, useSortBy, useRowSelect } from "react-table";
+import {
+  useTable,
+  useSortBy,
+  useRowSelect,
+  TableToggleRowsSelectedProps,
+} from "react-table";
 import { fromUnixTime, intervalToDuration, formatDuration } from "date-fns";
 import styled from "styled-components";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faAngleUp, faAngleDown } from "@fortawesome/free-solid-svg-icons";
 import { Device } from "../../_proto/examplecom/library/device_service_pb";
+import IndeterminateCheckbox from "./IndeterminateCheckbox";
 
 const StyledTr = styled.tr`
-  &:hover {
-    background-color: #f9f9f9;
-  }
   td {
     white-space: nowrap;
     overflow: hidden;
@@ -23,6 +26,10 @@ const StyledTh = styled.th`
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+
+  &:first-child > span {
+    display: none;
+  }
 `;
 
 type Props = {
@@ -84,7 +91,6 @@ const DeviceTable: React.FunctionComponent<Props> = ({ data, now }) => {
     getTableBodyProps,
     headerGroups,
     rows,
-    toggleAllRowsSelected,
     prepareRow,
   } = useTable(
     {
@@ -94,7 +100,30 @@ const DeviceTable: React.FunctionComponent<Props> = ({ data, now }) => {
     },
     useSortBy,
     useRowSelect,
-    getRowId
+    getRowId,
+    (hooks) => {
+      hooks.visibleColumns.push((columns) => [
+        // Let's make a column for selection
+        {
+          id: "selection",
+          // The header can use the table's getToggleAllRowsSelectedProps method
+          // to render a checkbox
+          Header: ({ getToggleAllRowsSelectedProps }) => (
+            <div>
+              <IndeterminateCheckbox {...getToggleAllRowsSelectedProps()} />
+            </div>
+          ),
+          // The cell can use the individual row's getToggleRowSelectedProps method
+          // to the render a checkbox
+          Cell: ({ row }) => (
+            <div>
+              <IndeterminateCheckbox {...row.getToggleRowSelectedProps()} />
+            </div>
+          ),
+        },
+        ...columns,
+      ]);
+    }
   );
 
   return (
@@ -140,11 +169,12 @@ const DeviceTable: React.FunctionComponent<Props> = ({ data, now }) => {
             <StyledTr
               {...row.getRowProps({
                 style: {
-                  backgroundColor: row.isSelected ? "#eee" : "",
+                  backgroundColor: row.isSelected
+                    ? "rgba(0, 123, 255, 0.5)"
+                    : "",
                 },
               })}
               onClick={() => {
-                toggleAllRowsSelected(false);
                 row.toggleRowSelected();
               }}
             >

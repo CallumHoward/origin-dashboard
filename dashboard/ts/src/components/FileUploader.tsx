@@ -31,7 +31,7 @@ export const FileUploader = () => {
   useEffect(() => {
     console.log("listing versions");
     listVersions((filenames: string[]) => {
-      setVersions(filenames);
+      setVersions(filenames.sort().reverse());
       console.log("got: ", filenames);
     });
   }, [uploadStatus]);
