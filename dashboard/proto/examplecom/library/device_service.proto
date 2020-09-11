@@ -25,9 +25,15 @@ message Versions {
   repeated string filenames = 1;
 }
 
+message FlashOTARequest {
+  string filename = 1;
+  repeated string deviceIds = 2;
+}
+
 service DeviceService {
   rpc GetDevice(GetDeviceRequest) returns (Device) {}
   rpc QueryDevices(Empty) returns (stream Device) {}
   rpc KeepAlive(Empty) returns (Empty) {}
   rpc ListVersions(Empty) returns (Versions) {}
+  rpc FlashOTA(FlashOTARequest) returns (Empty) {}
 }

@@ -193,7 +193,7 @@ func (s *deviceService) KeepAlive(ctx context.Context, e *library.Empty) (*libra
 	return e, nil
 }
 
-func (s *deviceService) ListVersions(ctx context.Context, e *library.Empty) (*library.Versions, error) {
+func (s deviceService) ListVersions(ctx context.Context, e *library.Empty) (*library.Versions, error) {
 	fmt.Println("listing versions")
 	grpc.SendHeader(ctx, metadata.Pairs("Pre-Response-Metadata", "Is-sent-as-headers-unary"))
 	grpc.SetTrailer(ctx, metadata.Pairs("Post-Response-Metadata", "Is-sent-as-trailers-unary"))
@@ -214,4 +214,17 @@ func (s *deviceService) ListVersions(ctx context.Context, e *library.Empty) (*li
 	}
 
 	return &versions, err
+}
+
+func (s deviceService) FlashOTA(ctx context.Context,
+	flashOTARequest *library.FlashOTARequest) (*library.Empty, error) {
+	grpc.SendHeader(ctx, metadata.Pairs("Pre-Response-Metadata", "Is-sent-as-headers-unary"))
+	grpc.SetTrailer(ctx, metadata.Pairs("Post-Response-Metadata", "Is-sent-as-trailers-unary"))
+
+	// Get the bin file
+
+	// Upload via MQTT
+	fmt.Println("uploading firmware via MQTT")
+
+	return nil, grpc.Errorf(codes.NotFound, "Device could not be found")
 }

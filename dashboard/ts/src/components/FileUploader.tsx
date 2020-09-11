@@ -1,13 +1,12 @@
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { FormGroup, Input, Label, Form, Button, Alert } from "reactstrap";
-import { listVersions } from "..";
+import { listVersions, flashOTA } from "..";
 
-const StyledForm = styled(Form)`
-  display: flex;
-  div {
-    width: 100%;
-  }
+const UploadContainer = styled.div`
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
 `;
 
 const StyledLabel = styled(Label)`
@@ -26,6 +25,8 @@ export const FileUploader = () => {
   const [uploadStatus, setUploadStatus] = useState<string>("");
   const [files, setFiles] = useState<FileList | null>(null);
   const [versions, setVersions] = useState<string[]>([]);
+  const [selectedVersion, setSelectedVersion] = useState<string>("");
+  const [selectedDevices, setSelectedDevices] = useState<string[]>([]);
 
   useEffect(() => {
     console.log("listing versions");
@@ -39,18 +40,13 @@ export const FileUploader = () => {
     setUploadStatus("");
     setFiles(newFiles);
   };
+
   const uploadFile = (event: React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
     if (!files || files.length < 1) {
       return;
     }
     const xhr = new XMLHttpRequest();
-    // xhr.upload.addEventListener("progress", (event) => {
-    //     if (event.lengthComputable) {
-    //         setUploadStatus(`progress: ${event.loaded / event.total}%`);
-    //     }
-    //     setUploadStatus('uploading... unknown %');
-    // });
     xhr.addEventListener("error", () => {
       setUploadStatus(`upload failed`);
     });
@@ -70,11 +66,23 @@ export const FileUploader = () => {
     formData.append("myFile", files[0]);
     xhr.send(formData);
   };
+
+  const requestFlash = (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.preventDefault();
+    console.log(selectedVersion);
+    if (!selectedVersion) {
+      return;
+    }
+    flashOTA(selectedVersion, selectedDevices, () => {
+      setUploadStatus("Flashed!");
+    });
+  };
+
   return (
-    <StyledForm>
-      <FormGroup>
-        <StyledLabel>Upload new version</StyledLabel>
-        <Form encType="multipart/form-data">
+    <UploadContainer>
+      <Form encType="multipart/form-data">
+        <FormGroup>
+          <StyledLabel>Upload new version</StyledLabel>
           <StyledInput
             type="file"
             accept=".bin"
@@ -86,17 +94,28 @@ export const FileUploader = () => {
             Upload
           </StyledButton>
           {!!uploadStatus && <Alert color="primary">{uploadStatus}</Alert>}
-        </Form>
-      </FormGroup>
-      <FormGroup>
-        <StyledLabel>Flash with version</StyledLabel>
-        <StyledInput type="select" name="version-selector" multiple>
-          {versions.map((v, i) => (
-            <option key={i}>{v}</option>
-          ))}
-        </StyledInput>
-        <StyledButton>Flash</StyledButton>
-      </FormGroup>
-    </StyledForm>
+        </FormGroup>
+      </Form>
+      <Form>
+        <FormGroup>
+          <StyledLabel>Flash with version</StyledLabel>
+          <StyledInput
+            type="select"
+            name="version-selector"
+            onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
+              setSelectedVersion(e.target.value);
+            }}
+            multiple
+          >
+            {versions.map((v, i) => (
+              <option key={i}>{v}</option>
+            ))}
+          </StyledInput>
+          <StyledButton type="submit" onClick={requestFlash}>
+            Flash
+          </StyledButton>
+        </FormGroup>
+      </Form>
+    </UploadContainer>
   );
 };

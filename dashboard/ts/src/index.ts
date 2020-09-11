@@ -5,6 +5,7 @@ import {
   GetDeviceRequest,
   Empty,
   Versions,
+  FlashOTARequest,
 } from "../_proto/examplecom/library/device_service_pb";
 
 declare const USE_TLS: boolean;
@@ -58,6 +59,32 @@ export const listVersions = (callback: (filenames: string[]) => void) => {
         const versions = message as Versions;
         console.log("getDevice.onEnd.message", versions.toObject());
         callback(versions.getFilenamesList());
+      }
+      console.log("getDevice.onEnd.trailers", trailers);
+    },
+  });
+};
+
+export const flashOTA = (
+  selectedVersion: string,
+  selectedDevices: string[],
+  onSuccess: () => void
+) => {
+  const flashOTARequest = new FlashOTARequest();
+  flashOTARequest.setFilename(selectedVersion);
+  flashOTARequest.setDeviceidsList(selectedDevices);
+
+  grpc.unary(DeviceService.FlashOTA, {
+    request: flashOTARequest,
+    host: host,
+    onEnd: (res) => {
+      const { status, statusMessage, headers, message, trailers } = res;
+      console.log("getDevice.onEnd.status", status, statusMessage);
+      console.log("getDevice.onEnd.headers", headers);
+      if (status === grpc.Code.OK && message) {
+        const versions = message as Versions;
+        console.log("getDevice.onEnd.message", versions.toObject());
+        onSuccess();
       }
       console.log("getDevice.onEnd.trailers", trailers);
     },
