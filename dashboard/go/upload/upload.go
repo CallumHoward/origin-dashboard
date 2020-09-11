@@ -2,12 +2,9 @@ package upload
 
 import (
 	"fmt"
-	"html/template"
 	"io/ioutil"
 	"net/http"
 )
-
-type Upload struct {}
 
 func uploadFile(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("method:", r.Method)
@@ -30,7 +27,7 @@ func uploadFile(w http.ResponseWriter, r *http.Request) {
 		fmt.Printf("MIME Header: %v\n", handler.Header)
 
 		// Write temporary file on our server
-		tempFile, err := ioutil.TempFile("images", "upload-*.bin")
+		tempFile, err := ioutil.TempFile("uploads", "upload-*.bin")
 		if err != nil {
 			fmt.Println(err)
 		}
@@ -48,8 +45,7 @@ func uploadFile(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "Uploading File")
 }
 
-func (u *Upload) SetupRoutes() {
+func SetupRoutes() {
 	http.HandleFunc("/upload", uploadFile)
 	http.ListenAndServe(":2020", nil)
 }
-

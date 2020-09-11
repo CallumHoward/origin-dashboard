@@ -88,7 +88,7 @@ const DeviceTable: React.FunctionComponent<Props> = ({ data, now }) => {
 
   return (
     <Table {...getTableProps()}>
-      <thead>
+      <thead style={{ whiteSpace: "nowrap" }}>
         {headerGroups.map((headerGroup) => (
           <tr {...headerGroup.getHeaderGroupProps()}>
             {headerGroup.headers.map((column) => (

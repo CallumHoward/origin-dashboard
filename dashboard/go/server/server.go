@@ -16,7 +16,7 @@ import (
 
 	library "origin/dashboard/go/_proto/examplecom/library"
 	originmqtt "origin/dashboard/go/originmqtt"
-	upload "origin/dashboard/go/upload"
+	"origin/dashboard/go/upload"
 
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 
@@ -27,14 +27,14 @@ import (
 var devices = map[string]*library.Device{}
 
 func main() {
-	chan upload.SetupRoutes()
+	go upload.SetupRoutes()
+
 	ds := deviceService{
 		make(chan *library.Device),
 		make(chan bool, 3),
 		time.Now(),
 		sync.Mutex{},
 	}
-	ds := deviceService{make(chan *library.Device, 5), make(chan bool)}
 	deviceNames := make(map[string]string)
 	deviceNames["70217"] = "Alice"
 	deviceNames["38E0D"] = "Bob"
@@ -173,7 +173,7 @@ func (s *deviceService) QueryDevices(e *library.Empty, stream library.DeviceServ
 			fmt.Println("end consumer - ended")
 			return nil
 		default:
-			fmt.Println("sleeping")
+			fmt.Printf(".")
 			time.Sleep(500 * time.Millisecond)
 			if !s.IsAlive() {
 				fmt.Println("No keepalive, will now end")
