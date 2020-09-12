@@ -25,21 +25,28 @@ import (
 	"golang.org/x/net/context"
 )
 
+type deviceService struct {
+	dChan    chan *library.Device
+	endChan  chan bool
+	alive    time.Time
+	aliveMux sync.Mutex
+	om       *originmqtt.OriginMqtt
+}
+
 var devices = map[string]*library.Device{}
 
 func main() {
-	go upload.SetupRoutes()
-
-	ds := deviceService{
-		make(chan *library.Device),
-		make(chan bool, 3),
-		time.Now(),
-		sync.Mutex{},
-	}
 	deviceNames := make(map[string]string)
 	deviceNames["70217"] = "Alice"
 	deviceNames["38E0D"] = "Bob"
+	deviceNames["18EAD"] = "Charlie"
 
+	var ds deviceService
+
+	// Start HTTP service for file uploads
+	go upload.SetupRoutes()
+
+	// Start MQTT service
 	var onRollCall mqtt.MessageHandler = func(client mqtt.Client, msg mqtt.Message) {
 		message := string(msg.Payload())
 		switch msg.Topic() {
@@ -53,15 +60,26 @@ func main() {
 		default:
 			fmt.Println("Unhandled MQTT topic:")
 		}
-		fmt.Printf("TOPIC: %s\n", msg.Topic())
-		fmt.Printf("MSG: %s\n", message)
+		// fmt.Printf("TOPIC: %s\n", msg.Topic())
+		// fmt.Printf("MSG: %s\n", message)
 	}
 
 	om := originmqtt.New("192.168.20.11:1883", onRollCall)
 	om.Connect()
 	defer om.Disconnect()
+
+	// Subscribe to rollCall and ping topics and send "hello"
 	om.RollCall()
-	serve(&ds)
+
+	// Start gRPC service
+	ds = deviceService{
+		make(chan *library.Device),
+		make(chan bool, 3),
+		time.Now(),
+		sync.Mutex{},
+		&om,
+	}
+	serve(&ds) // this blocks
 }
 
 func addDevice(deviceNames map[string]string, message string) library.Device {
@@ -125,13 +143,6 @@ func serve(ds *deviceService) {
 	}
 }
 
-type deviceService struct {
-	dChan    chan *library.Device
-	endChan  chan bool
-	alive    time.Time
-	aliveMux sync.Mutex
-}
-
 func (s *deviceService) IsAlive() bool {
 	s.aliveMux.Lock()
 	defer s.aliveMux.Unlock()
@@ -185,7 +196,7 @@ func (s *deviceService) QueryDevices(e *library.Empty, stream library.DeviceServ
 }
 
 func (s *deviceService) KeepAlive(ctx context.Context, e *library.Empty) (*library.Empty, error) {
-	fmt.Println("going to keep alive")
+	// fmt.Println("going to keep alive")
 	s.aliveMux.Lock()
 	defer s.aliveMux.Unlock()
 	s.alive = time.Now()
@@ -221,10 +232,12 @@ func (s deviceService) FlashOTA(ctx context.Context,
 	grpc.SendHeader(ctx, metadata.Pairs("Pre-Response-Metadata", "Is-sent-as-headers-unary"))
 	grpc.SetTrailer(ctx, metadata.Pairs("Post-Response-Metadata", "Is-sent-as-trailers-unary"))
 
-	// Get the bin file
+	fmt.Println("Updating devices")
 
-	// Upload via MQTT
-	fmt.Println("uploading firmware via MQTT")
+	// Ask devices to update to pull specified firmware and update
+	for _, device := range flashOTARequest.GetDeviceIds() {
+		s.om.FlashOTA(device, flashOTARequest.GetFilename())
+	}
 
-	return nil, grpc.Errorf(codes.NotFound, "Device could not be found")
+	return &library.Empty{}, nil
 }

@@ -1,5 +1,4 @@
 import React, { useEffect, forwardRef } from "react";
-import { Input } from "reactstrap";
 
 interface ICProps {
   indeterminate?: boolean;

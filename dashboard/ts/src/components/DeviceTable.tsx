@@ -1,11 +1,6 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useEffect } from "react";
 import { Table } from "reactstrap";
-import {
-  useTable,
-  useSortBy,
-  useRowSelect,
-  TableToggleRowsSelectedProps,
-} from "react-table";
+import { useTable, useSortBy, useRowSelect } from "react-table";
 import { fromUnixTime, intervalToDuration, formatDuration } from "date-fns";
 import styled from "styled-components";
 
@@ -35,9 +30,14 @@ const StyledTh = styled.th`
 type Props = {
   data: Device.AsObject[];
   now: Date;
+  setSelectedDevices: React.Dispatch<React.SetStateAction<string[]>>;
 };
 
-const DeviceTable: React.FunctionComponent<Props> = ({ data, now }) => {
+const DeviceTable: React.FunctionComponent<Props> = ({
+  data,
+  now,
+  setSelectedDevices,
+}) => {
   const columns = React.useMemo(
     () => [
       {
@@ -92,6 +92,8 @@ const DeviceTable: React.FunctionComponent<Props> = ({ data, now }) => {
     headerGroups,
     rows,
     prepareRow,
+    selectedFlatRows,
+    state: { selectedRowIds },
   } = useTable(
     {
       autoResetSelectedRows: false,
@@ -125,6 +127,10 @@ const DeviceTable: React.FunctionComponent<Props> = ({ data, now }) => {
       ]);
     }
   );
+
+  useEffect(() => {
+    setSelectedDevices(selectedFlatRows.map((r: any) => r.original.id));
+  }, [selectedRowIds]);
 
   return (
     <Table

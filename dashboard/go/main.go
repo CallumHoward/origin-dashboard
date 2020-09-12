@@ -1,7 +1,7 @@
 package main
 
 import (
-	"fmt"
+	// "fmt"
 	"time"
 
 	mqtt "github.com/eclipse/paho.mqtt.golang"
@@ -10,8 +10,8 @@ import (
 
 func main() {
 	var onRollCall mqtt.MessageHandler = func(client mqtt.Client, msg mqtt.Message) {
-		fmt.Printf("TOPIC: %s\n", msg.Topic())
-		fmt.Printf("MSG: %s\n", msg.Payload())
+		// fmt.Printf("TOPIC: %s\n", msg.Topic())
+		// fmt.Printf("MSG: %s\n", msg.Payload())
 	}
 
 	om := originmqtt.New("192.168.20.11:1883", onRollCall)

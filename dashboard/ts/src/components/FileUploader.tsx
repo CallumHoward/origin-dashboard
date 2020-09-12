@@ -3,6 +3,10 @@ import styled from "styled-components";
 import { FormGroup, Input, Label, Form, Button, Alert } from "reactstrap";
 import { listVersions, flashOTA } from "..";
 
+type Props = {
+  selectedDevices: string[];
+};
+
 const UploadContainer = styled.div`
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -21,12 +25,13 @@ const StyledInput = styled(Input)`
   margin: 0.5rem 0 0.5rem 0;
 `;
 
-export const FileUploader = () => {
+export const FileUploader: React.FunctionComponent<Props> = ({
+  selectedDevices,
+}) => {
   const [uploadStatus, setUploadStatus] = useState<string>("");
   const [files, setFiles] = useState<FileList | null>(null);
   const [versions, setVersions] = useState<string[]>([]);
   const [selectedVersion, setSelectedVersion] = useState<string>("");
-  const [selectedDevices, setSelectedDevices] = useState<string[]>([]);
 
   useEffect(() => {
     console.log("listing versions");
@@ -69,10 +74,11 @@ export const FileUploader = () => {
 
   const requestFlash = (event: React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
-    console.log(selectedVersion);
+    console.log("request flash with version: ", selectedVersion);
     if (!selectedVersion) {
       return;
     }
+    console.log("request flash with devices: ", selectedDevices);
     flashOTA(selectedVersion, selectedDevices, () => {
       setUploadStatus("Flashed!");
     });

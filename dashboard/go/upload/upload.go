@@ -48,6 +48,8 @@ func uploadFile(w http.ResponseWriter, r *http.Request) {
 }
 
 func SetupRoutes() {
+	fs := http.FileServer(http.Dir("uploads"))
+	http.Handle("/uploads/", http.StripPrefix("/uploads", fs))
 	http.HandleFunc("/upload", uploadFile)
 	http.ListenAndServe(":2020", nil)
 }

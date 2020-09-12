@@ -11,6 +11,7 @@ let sourceData = new Map<string, Device.AsObject>();
 export const Hello = () => {
   const [deviceData, setDeviceData] = useState<Device.AsObject[]>([]);
   const [now, setNow] = useState<Date>(new Date());
+  const [selectedDevices, setSelectedDevices] = useState<string[]>([]);
 
   const addDevice = (device: Device) => {
     const d = device.toObject();
@@ -49,14 +50,18 @@ export const Hello = () => {
         <Row>
           <Col>
             <Section>
-              <FileUploader />
+              <FileUploader selectedDevices={selectedDevices} />
             </Section>
           </Col>
         </Row>
         <Row>
           <Col>
             <Section>
-              <DeviceTable data={deviceData} now={now} />
+              <DeviceTable
+                data={deviceData}
+                now={now}
+                setSelectedDevices={setSelectedDevices}
+              />
             </Section>
           </Col>
         </Row>
